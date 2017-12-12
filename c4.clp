@@ -21,4 +21,4 @@
 
 (defrule dumb-defense (G1 ?x ?y) => (assert (next-move(move ?x))))
   
-(defrule block-three-x (G1 ?x ?y) (G1 ?x1 ?y) (G1 ?x2 ?y) (not(G2 ?a ?y)) (not(next-move(move ?z))) => (assert(next-move(move ?a))))
+(defrule block-three-x (G1 ?x ?y) (G1 ?x1 ?y) (G1 ?x2 ?y) (not(or(G2 ?a ?y) (G1 ?a ?y))) (not(next-move(move ?z))) => (assert(next-move(move ?a))))
