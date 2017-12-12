@@ -192,16 +192,15 @@ public class gui {
     	String userMove = "(G1 "+userChoise+" "+userY+" )";
 	
 		clips.assertString(userMove);	
-		System.out.println(clips.eval("(agenda)"));
+		System.out.println( "agenda"+clips.eval("(agenda)"));
 
-		clips.run(1);	  
+		clips.run();	  
 
 		
 	    PrimitiveValue pv = (PrimitiveValue) clips.eval("(get-all-facts-by-names next-move)");
 	    
 
     	String clipsResponse =pv.toString();
-    	//String n = clipsResponse.split("(<")[1].split(">)")[1].split("-")[1];
     	
 		String a=clipsResponse.replaceAll(">", "");
 		String n=a.substring(0, a.length()-1).split("-")[1];
@@ -209,14 +208,19 @@ public class gui {
 		System.out.print("a : "+a);
 
 		System.out.print("move : ");
-
+		int action=Integer.valueOf((clips.eval("(fact-slot-value "+n+" move)")).toString());
 		
-		String action=(clips.eval("(fact-slot-value "+n+" move)")).toString();
+		
+		int y = my_grid.find_y(action);//check for space in collumn
+		String computerMove = "(G2 "+action+" "+y+" )";
+		clips.assertString(computerMove);	
+		 
+		
 		System.out.println(clips.eval("(fact-slot-value "+n+" move)"));
 		
 
 
-        clips.load("c4.clp");
+        //clips.load("c4.clp");
         
         clips.eval("(retract "+n+" )");
         System.out.println(" fatti dopo mossa");
@@ -224,7 +228,7 @@ public class gui {
 		System.out.println(clips.eval("(facts)"));
 		
 	
-		return Integer.valueOf(action);
+		return action;
 	    
     }
     

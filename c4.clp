@@ -17,7 +17,13 @@
   ?facts)
 
 
-(defrule random (dim (x ?x) (y ?y))=> (assert (next-move (move (random 0 (- ?x 1))))))
+;;(defrule random (dim (x ?x) (y ?y)) (not(next-move (move ?z)))=> (assert (next-move (move (random 0 (- ?x 1))))))
 
-(defrule dumb-defense (G1 ?x ?y) => (assert (next-move(move ?x))))
-  
+(defrule random (dim (x ?x) (y ?y)) (not(next-move (move ?z)))=> (assert (next-move (move 1))))
+
+
+;;(defrule dumb-defense-y (G1 ?x ?y) (not(next-move (move ?z))) => (assert (next-move(move ?x))))
+;;(defrule dumb-defense-sx (G1 ?x ?y) (not(next-move (move ?z))) => (assert (next-move(move (- ?x 1)))))  
+;;(defrule dumb-defense-dx (G1 ?x ?y) (not(next-move (move ?z))) => (assert (next-move(move (+ ?x 1)))))
+
+(defrule block-three-x (G1 ?x ?y) (G1 ?x1 ?y) (G1 ?x2 ?y) (not(or (G1 ?a ?y) (G2 ?a ?y))) (not(next-move(move ?z))) => (assert(next-move(move ?a))))
