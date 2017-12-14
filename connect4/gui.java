@@ -6,18 +6,12 @@ package connect4;
 
 import javax.swing.*;
 import javax.swing.border.*;
-import net.sf.clipsrules.jni.*;
-import net.sf.*;
-
-
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 
 public class gui {
 
     //declaration of gui objects
-	private  Environment clips = null;
     private JFrame frame;
     private JLabel[][] slots;
     private JButton[] buttons;
@@ -36,17 +30,10 @@ public class gui {
     Grid my_grid = new Grid();
     logic my_logic = new logic(my_grid); //create game logic
 
+    Clips clips=new Clips(xsize,ysize);
     public gui() {
     	
     	
-    	clips = new Environment();
-        clips.load("c4.clp");
-        clips.assertString("(dim  (x 7) (y 6))");
-        System.out.println(" fatti iniziali");
-
-        System.out.println(clips.eval("(facts)"));
-        //clips.reset();
-
         frame = new JFrame("connect four");
 
         JPanel panel = (JPanel) frame.getContentPane();
@@ -113,7 +100,7 @@ public class gui {
     			buttons[i].setEnabled(false);
     		}
     		
-    		int a=decisionMaking(lastx,lasty);
+    		int a=clips.decisionMaking(lastx,lasty,my_grid);
 			
 			 int y = my_grid.find_y(a);//check for space in collumn
 	         if (y != -1) {
@@ -184,55 +171,6 @@ public class gui {
         }
     }
 
-    
-    public int decisionMaking(int userChoise,int userY){
-
-		//System.out.println(clips.eval("(agenda)").toString());
-	   
-    	String userMove = "(G1 "+userChoise+" "+userY+" )";
-	
-		clips.assertString(userMove);	
-		System.out.println( "agenda"+clips.eval("(agenda)"));
-
-		clips.run();	  
-
-		
-	    PrimitiveValue pv = (PrimitiveValue) clips.eval("(get-all-facts-by-names next-move)");
-	    
-
-    	String clipsResponse =pv.toString();
-    	
-		String a=clipsResponse.replaceAll(">", "");
-		String n=a.substring(0, a.length()-1).split("-")[1];
-		
-		System.out.print("a : "+a);
-
-		System.out.print("move : ");
-		int action=Integer.valueOf((clips.eval("(fact-slot-value "+n+" move)")).toString());
-		
-		
-		int y = my_grid.find_y(action);//check for space in collumn
-		String computerMove = "(G2 "+action+" "+y+" )";
-		clips.assertString(computerMove);	
-		 
-		
-		System.out.println(clips.eval("(fact-slot-value "+n+" move)"));
-		
-
-
-        //clips.load("c4.clp");
-        
-        clips.eval("(retract "+n+" )");
-        System.out.println(" fatti dopo mossa");
-
-		System.out.println(clips.eval("(facts)"));
-		
-	
-		return action;
-	    
-    }
-    
-    
     public boolean getHasWon() {
         return hasWon;
     }
@@ -249,5 +187,8 @@ public class gui {
         return newGame;
     }
 
-   
+   public Grid getMy_grid()
+   {
+	   return this.getMy_grid();
+   }
 }
