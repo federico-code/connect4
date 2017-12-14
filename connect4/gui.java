@@ -100,6 +100,7 @@ public class gui {
     			buttons[i].setEnabled(false);
     		}
     		
+    		
     		int a=clips.decisionMaking(lastx,lasty,my_grid);
 			
 			 int y = my_grid.find_y(a);//check for space in collumn

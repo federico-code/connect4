@@ -14,8 +14,12 @@ public class Clips {
 		this.ysize=ysize;
 		clips = new Environment();
         clips.load("c4.clp");
-        clips.assertString("(dim  (x 7) (y 6))");
-        System.out.println(" fatti iniziali");
+        String dim_assert = "(dim  (x "+ (xsize-1) +") (y "+(ysize-1)+"))";
+        System.out.println(dim_assert);
+
+        clips.assertString(dim_assert);
+
+        System.out.println("fatti iniziali");
 
         System.out.println(clips.eval("(facts)"));
         //clips.reset();
@@ -24,69 +28,71 @@ public class Clips {
 	
 	  public int decisionMaking(int userChoise,int userY,Grid my_grid){
 
+		  Thread t = Thread.currentThread();
+	    	try {
+				t.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			System.out.println("\n_______begin decision making process________\n");
-		   // asserzione mossa g1
-	    	String userMove = "(G1 "+userChoise+" "+userY+" )";
-			clips.assertString(userMove);
-			
-			
-			// stampa fatti wm
-			System.out.println("fatti prima della mossa");
-		    System.out.println(clips.eval("(facts)"));
-		    System.out.println("");
 
-		    // stampa agenda
-		    System.out.println("agenda: ");
-			System.out.println(clips.eval("(agenda)")); 
+		    
+	    	String userMove = "(G1 "+userChoise+" "+userY+" )";
+			clips.assertString(userMove);	
 			
 			
-			// cicla finchè nclips non asserisce un next move
+			insertPossibleMoveFacts( my_grid,  xsize );
+			
+			
 			int inference_step = 1;
 			String pv = "()";
 			while(pv.contentEquals("()"))
 			{
-				System.out.println("\nrunning inference engine...\n");
-
-				clips.run(inference_step);	
+				System.out.println("\n########running inference engine ("+inference_step+")...##########\n");
+				
+		        System.out.println("fatti prima della mossa");
+		        System.out.println(clips.eval("(facts)"));
+				System.out.println("");
+				
+				System.out.println("agenda: ");
+				System.out.println(clips.eval("(agenda)"));
+				
+				clips.run(1);	
 				
 			    pv = clips.eval("(get-all-facts-by-names next-move)").toString();
 		    	System.out.println("next-move fact: "+ pv);
 		    	inference_step++;
+				System.out.println("\n########end inference engine...##########\n");
+
 			}
-			
-			
-	    	String clipsResponse =pv;
+
+	    	String clipsResponse = pv;
 	    	
-	    	// restituisce il numero del fatto next move 
-	    	int n = getFactNumber(clipsResponse);
+			int n = getFactNumber(clipsResponse);
 			System.out.println("fact:"+n);
-			
-			// dato il numero del fatto restituisce il numero della colonna 
+
 			int action = Integer.valueOf((clips.eval("(fact-slot-value "+n+" move)")).toString());
-
-			// stammpa colonna
+	    	
 			System.out.println("action: click col "+(action+1)+"\n");
-
 			
+			retractAllFacts("possible-move");
 			retractAllFacts("next-move");
-
 			
-			int y = my_grid.find_y(action);//check for space in collumn
-			
-			// asserzione mossa g2
+			int y = my_grid.find_y(action);
 			String computerMove = "(G2 "+action+" "+y+" )";
 			clips.assertString(computerMove);	
 			 
-			
-			System.out.println("fatti dopo mossa");
+	  
+	        System.out.println("fatti dopo mossa");
 	        System.out.println(clips.eval("(facts)"));
 			System.out.println("");
 
 			System.out.println("_______end decision making process________");
 			System.out.println("");
 			System.out.println("");
-			
-			return action;  
+
+			return action;
 	    }
 	  
 	  
