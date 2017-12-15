@@ -67,12 +67,19 @@
 )
 
 
+
 ;;############ 2-block defense rule (x) ############
 
 (defrule connect-x-2-blocks
+	(declare (salience ?*high-priority*))
 	(G1 ?x ?y)
 	(G1 ?x1 ?y)
 	(test (eq -1 (- ?x ?x1)))
+	(and
+		(not (connect-3-x (begin ?x) (end $?) (y ?y) (def-sx  $? ) (def-dx $?)) )
+		(not (connect-3-x (begin $?) (end ?x1) (y ?y) (def-sx  $? ) (def-dx $?)) )
+	
+	)
 	(not (connect-2-x (begin ?x) (end ?x1) (y ?y) (def-sx  $? ) (def-dx $?) ))
 	=> 
 	(assert (connect-2-x (begin ?x) (end ?x1) (y ?y) (def-sx (- ?x 1)) (def-dx (+ ?x1 1)) ))
@@ -105,14 +112,14 @@
 )
 
 (defrule connect-defense-x-3-blocks-dx 
-	(connect-3-x (begin ?start) (end ?finish) (y ?y) (def-dx ?defense-dx) (def-sx ?defense-sx))
+	(connect-3-x (begin ?start) (end ?finish) (y ?y) (def-sx ?defense-sx) (def-dx ?defense-dx))
 	(possible-move ?defense-dx ?y)
 	=> 
 	(assert (next-move (move ?defense-dx)))
 )
 
 (defrule connect-defense-x-3-sx 
-	(connect-3-x (begin ?start) (end ?finish) (y ?y) (def-dx ?defense-dx) (def-sx ?defense-sx))
+	(connect-3-x (begin ?start) (end ?finish) (y ?y) (def-sx ?defense-sx) (def-dx ?defense-dx))
 	(possible-move ?defense-sx ?y)
 	=> 
 	(assert (next-move (move ?defense-sx)))
@@ -121,9 +128,15 @@
 ;;############ 2-block defense rule (y) ############
 
 (defrule connect-y-2-blocks
+	(declare (salience ?*high-priority*))
 	(G1 ?x ?y)
 	(G1 ?x ?y1)
 	(test (eq -1 (- ?y ?y1)))
+	(and
+		(not (connect-3-y (begin ?y) (end $?) (x ?x) (def-top $?)) )
+		(not (connect-3-y (begin $?) (end ?y1) (x ?x) (def-top $?)) )
+	
+	)
 	(not (connect-2-y (begin ?y) (end ?y1) (x ?x) (def-top $?)  ))
 	=> 
 	(assert (connect-2-y (begin ?y) (end ?y1) (x ?x) (def-top (- ?y 1))  ))
@@ -140,19 +153,20 @@
 ;;############ 3-block defense rule (y) ############
 
 (defrule connect-y-3-blocks
-	(G1 ?x ?y)
-	(G1 ?x ?y1)
-	(G1 ?x ?y2)
-	(and (test (eq -1 (- ?y ?y1))) (test (eq -1 (- ?y ?y2))))
-	(not (connect-3-y (begin ?y) (end ?y1) (x ?x) (def-top $?)  ))
+	(declare (salience ?*high-priority*))
+	?f1<- (connect-2-y (begin ?y) (end ?y1) (x ?x) (def-top $?) )
+	?f2<- (connect-2-y (begin ?y1) (end ?y2) (x ?x) (def-top ?def-top) )
+	(not (connect-3-y (begin ?y) (end ?y2) (x ?x) (def-top $?) ))
 	=> 
-	(assert (connect-3-y (begin ?y) (end ?y1) (x ?x) (def-top (- ?y 1))  ))
+	(assert (connect-3-y (begin ?y) (end ?y2) (x ?x) (def-top (- ?def-top 1) )))
+	(retract ?f1 ?f2)
 )
 
-(defrule connect-defense-y-3-top 
-	(connect-3-y (begin ?start) (end ?finish) (x ?x) (def-top ?defense-top))
+(defrule connect-defense-y-3-blocks-top 
+	(connect-3-y (begin ?start) (end ?finish) (x ?x) (def-top ?defense-top) )
 	(possible-move ?x ?defense-top)
 	=> 
 	(assert (next-move (move ?x)))
 )
+
 
