@@ -121,11 +121,19 @@
 ;;Rule that chose a random move within the bounds of the game board
 (defrule random 
 	(dim (x ?x) (y ?y)) 
-	(not(next-move (move ?z))) => 
-	(assert (next-move (move (random 0 ?x))))
+	=> 
+	(assert (random-move (move (random 0 ?x))))
 )
 
 
+;;Rule that chose a random move within the bounds of the game board
+(defrule random-next-move 
+	?f<-(random-move (move ?x))
+	(possible-move ?x ?y)  
+	=> 
+	(retract ?f)
+	(assert (next-move (move ?x)))
+)
 ;; ___________________________________________________________________________________
 ;;|																					  |
 ;;|				  RULES FOR SPOTTING CONNECTIONS OF THE OPPONENT BLOCKS				  |
