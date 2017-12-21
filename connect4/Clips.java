@@ -6,18 +6,24 @@ public class Clips {
 	private  Environment clips = null;
 	private int xsize;
 	private int ysize;
-
+	private int cpu_turn = 2;
+	private int player_turn = 1;
 	
 	Clips(int xsize,int ysize)
 	{
 		this.xsize=xsize;
 		this.ysize=ysize;
 		clips = new Environment();
-        clips.load("c4.clp");
+		clips.load("connect.clp");
+		clips.load("defense1.clp");
+		clips.load("attack1.clp");
         String dim_assert = "(dim  (x "+ (xsize-1) +") (y "+(ysize-1)+"))";
         System.out.println(dim_assert);
-
+        String cpu_turn_assert = "(cpu_turn "+ cpu_turn + ")";
+        String player_turn_assert = "(player_turn "+ player_turn + ")";
         clips.assertString(dim_assert);
+        clips.assertString(cpu_turn_assert);
+        clips.assertString(player_turn_assert);
 
         System.out.println("fatti iniziali");
 
@@ -38,7 +44,7 @@ public class Clips {
 			System.out.println("\n_______begin decision making process________\n");
 
 		    
-	    	String userMove = "(G1 "+userChoise+" "+userY+" )";
+	    	String userMove = "(G "+player_turn+" "+userChoise+" "+userY+" )";
 			clips.assertString(userMove);	
 			
 			
@@ -80,7 +86,7 @@ public class Clips {
 			retractAllFacts("next-move");
 			
 			int y = my_grid.find_y(action);
-			String computerMove = "(G2 "+action+" "+y+" )";
+			String computerMove = "(G "+cpu_turn+" "+action+" "+y+" )";
 			clips.assertString(computerMove);	
 			 
 	  
